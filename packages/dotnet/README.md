@@ -3,7 +3,7 @@
 A large, **auto-updated** list of disposable / temporary / throwaway email domains (mailinator, 10minutemail, guerrillamail, …), with a tiny zero-dependency `IsDisposable()` helper for .NET.
 
 - **160,000+ domains**, aggregated from 6 well-maintained public blocklists, deduped and normalized (lowercased, IDNA/punycode).
-- **Refreshed daily** — a new version is published only when the set actually changes.
+- **refreshed weekly** — a new version is published only when the set actually changes.
 - **netstandard2.0**, zero dependencies. The list is embedded, lookups are O(1).
 
 ## Install

@@ -7,7 +7,7 @@
 A large, **auto-updated** list of disposable / temporary / throwaway email domains (mailinator, 10minutemail, guerrillamail, …), with a tiny zero-dependency `isDisposable()` helper.
 
 - **160,000+ domains**, aggregated from 6 well-maintained public blocklists, deduped and normalized (lowercased, IDNA/punycode).
-- **Refreshed daily** by a GitHub Action — a new version is published only when the set actually changes.
+- **refreshed weekly** by a GitHub Action — a new version is published only when the set actually changes.
 - **Zero dependencies.** Ships the raw list too, so you can use it however you like.
 
 ## Install
