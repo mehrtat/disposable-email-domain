@@ -1,0 +1,30 @@
+{
+  "count": 162865,
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf",
+      "count": 7978
+    },
+    {
+      "url": "https://raw.githubusercontent.com/disposable/disposable-email-domains/master/domains.txt",
+      "count": 74491
+    },
+    {
+      "url": "https://raw.githubusercontent.com/7c/fakefilter/main/txt/data.txt",
+      "count": 4716
+    },
+    {
+      "url": "https://raw.githubusercontent.com/FGRibreau/mailchecker/master/list.txt",
+      "count": 56360
+    },
+    {
+      "url": "https://raw.githubusercontent.com/wesbos/burner-email-providers/master/emails.txt",
+      "count": 27279
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/index.json",
+      "count": 121557
+    }
+  ],
+  "generated_by": "github-action"
+}

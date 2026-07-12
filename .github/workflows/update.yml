@@ -1,0 +1,90 @@
+name: Update disposable domains
+
+# Runs daily. Aggregates the sources; if the domain set is byte-identical to the
+# committed one, it exits clean (no commit, no tag, no release). If it changed,
+# it commits the list, bumps package versions, tags v1.0.PATCH, and cuts a
+# GitHub Release with the +added/-removed delta and the list files attached.
+on:
+  schedule:
+    - cron: "0 6 * * *" # every day, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need full history + tags for the version bump
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Aggregate sources
+        run: python3 aggregate.py
+
+      - name: Detect change
+        id: diff
+        run: |
+          if git diff --quiet -- domains.txt; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No change in domains.txt — nothing to release."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute delta and next version
+        if: steps.diff.outputs.changed == 'true'
+        id: meta
+        run: |
+          count=$(grep -c . domains.txt)
+          added=$(comm -13 <(git show HEAD:domains.txt | sort) <(sort domains.txt) | grep -c . || true)
+          removed=$(comm -23 <(git show HEAD:domains.txt | sort) <(sort domains.txt) | grep -c . || true)
+          latest=$(git tag -l 'v1.0.*' | sort -t. -k3 -n | tail -1)
+          if [ -z "$latest" ]; then
+            next="v1.0.0"
+          else
+            next="v1.0.$(( ${latest##*.} + 1 ))"
+          fi
+          {
+            echo "count=$count"
+            echo "added=$added"
+            echo "removed=$removed"
+            echo "version=$next"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Sync packages and bump versions
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          sh scripts/sync-packages.sh
+          sh scripts/set-version.sh "${{ steps.meta.outputs.version }}"
+
+      - name: Commit, tag and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add domains.txt domains.json metadata.json packages
+          git commit -m "chore: refresh disposable domains (${{ steps.meta.outputs.count }} domains)"
+          git tag "${{ steps.meta.outputs.version }}"
+          git push origin HEAD --tags
+
+      - name: Create GitHub Release
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "Automated refresh on $(date -u +%Y-%m-%d)."
+            echo
+            echo "- Total domains: **${{ steps.meta.outputs.count }}**"
+            echo "- Added: **+${{ steps.meta.outputs.added }}**"
+            echo "- Removed: **-${{ steps.meta.outputs.removed }}**"
+          } > release-notes.md
+          gh release create "${{ steps.meta.outputs.version }}" domains.txt domains.json \
+            --title "${{ steps.meta.outputs.version }} ($(date -u +%Y-%m-%d))" \
+            --notes-file release-notes.md

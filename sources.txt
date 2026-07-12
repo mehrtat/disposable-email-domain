@@ -1,0 +1,27 @@
+# Curated disposable / temporary email domain blocklist sources.
+# One raw URL per line. Blank lines and lines starting with '#' are ignored.
+# aggregate.py fetches each, parses (txt or JSON array), then unions + dedupes.
+# A source that 404s / times out is skipped; the run aborts only if MORE than
+# half the sources fail, so a bad fetch day can never wipe the published list.
+#
+# Sizes/notes below are approximate and were verified live on 2026-07-12.
+# To propose a source: open a PR adding its raw URL here (keep it maintained).
+
+# disposable-email-domains org — the de-facto community standard, actively
+# maintained, plain .conf list. ~10k domains.
+https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf
+
+# disposable/disposable-email-domains — auto-generated, refreshed frequently. ~9k.
+https://raw.githubusercontent.com/disposable/disposable-email-domains/master/domains.txt
+
+# 7c/fakefilter — maintained, provider-grouped (## headers dropped as comments). ~9k.
+https://raw.githubusercontent.com/7c/fakefilter/main/txt/data.txt
+
+# FGRibreau/mailchecker — the npm mailchecker list, broad coverage. ~16k.
+https://raw.githubusercontent.com/FGRibreau/mailchecker/master/list.txt
+
+# wesbos/burner-email-providers — large maintained burner list. ~19k.
+https://raw.githubusercontent.com/wesbos/burner-email-providers/master/emails.txt
+
+# ivolo/disposable-email-domains — legacy but still live, JSON-array format. ~3k.
+https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/index.json

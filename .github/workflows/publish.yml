@@ -1,0 +1,73 @@
+name: Publish packages
+
+# Fires when a Release is published (by update.yml). Builds and publishes the
+# npm and NuGet packages at the release tag. Each publish step is guarded on its
+# secret and SKIPS cleanly when the secret is absent, so the repo works before
+# any tokens are configured. Go and PHP need nothing — the git tag is the release.
+on:
+  release:
+    types: [published]
+
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - name: Check for NPM_TOKEN
+        id: sec
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -n "$NPM_TOKEN" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "NPM_TOKEN not set — skipping npm publish."
+          fi
+      - uses: actions/setup-node@v4
+        if: steps.sec.outputs.ok == 'true'
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Build and publish
+        if: steps.sec.outputs.ok == 'true'
+        working-directory: packages/npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm install
+          npm run build
+          npm publish --access public
+
+  nuget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - name: Check for NUGET_API_KEY
+        id: sec
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if [ -n "$NUGET_API_KEY" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "NUGET_API_KEY not set — skipping NuGet publish."
+          fi
+      - uses: actions/setup-dotnet@v4
+        if: steps.sec.outputs.ok == 'true'
+        with:
+          dotnet-version: "8.0.x"
+      - name: Pack and push
+        if: steps.sec.outputs.ok == 'true'
+        working-directory: packages/dotnet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet pack -c Release -o out
+          dotnet nuget push "out/*.nupkg" --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json --skip-duplicate

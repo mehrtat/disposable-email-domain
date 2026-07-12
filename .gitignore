@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Node / TypeScript
+node_modules/
+packages/npm/dist/
+
+# .NET
+bin/
+obj/
+packages/dotnet/out/
+
+# misc
+release-notes.md
+notes.md
