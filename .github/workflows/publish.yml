@@ -18,7 +18,7 @@ jobs:
   npm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.release.tag_name || inputs.tag }}
       - name: Check for NPM_TOKEN
@@ -32,7 +32,7 @@ jobs:
             echo "ok=false" >> "$GITHUB_OUTPUT"
             echo "NPM_TOKEN not set — skipping npm publish."
           fi
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         if: steps.sec.outputs.ok == 'true'
         with:
           node-version: "20"
@@ -50,7 +50,7 @@ jobs:
   nuget:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event.release.tag_name || inputs.tag }}
       - name: Check for NUGET_API_KEY
@@ -64,7 +64,7 @@ jobs:
             echo "ok=false" >> "$GITHUB_OUTPUT"
             echo "NUGET_API_KEY not set — skipping NuGet publish."
           fi
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         if: steps.sec.outputs.ok == 'true'
         with:
           dotnet-version: "8.0.x"
