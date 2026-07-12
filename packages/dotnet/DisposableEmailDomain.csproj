@@ -5,13 +5,15 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <PackageId>DisposableEmailDomain</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Mehrdad TAT</Authors>
     <Description>Aggregated, deduped, normalized list of disposable / temporary email domains, with an IsDisposable() helper. Auto-refreshed daily.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>disposable;temporary;email;domains;blocklist;validation</PackageTags>
     <RepositoryUrl>https://github.com/mehrtat/disposable-email-domain</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/mehrtat/disposable-email-domain</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +21,7 @@
     <EmbeddedResource Include="domains.txt">
       <LogicalName>domains.txt</LogicalName>
     </EmbeddedResource>
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 {
   "name": "disposable-email-domain",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Aggregated, deduped, normalized list of disposable / temporary email domains, with an isDisposable() helper. Auto-refreshed daily.",
   "keywords": [
     "disposable",
@@ -17,11 +17,16 @@
     "url": "https://github.com/mehrtat/disposable-email-domain.git",
     "directory": "packages/npm"
   },
+  "homepage": "https://github.com/mehrtat/disposable-email-domain#readme",
+  "bugs": {
+    "url": "https://github.com/mehrtat/disposable-email-domain/issues"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "domains.json"
+    "domains.json",
+    "README.md"
   ],
   "scripts": {
     "build": "tsc",
