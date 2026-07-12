@@ -7,6 +7,12 @@ name: Publish packages
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish (e.g. v1.0.0)"
+        required: true
+        default: "v1.0.0"
 
 jobs:
   npm:
@@ -14,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
       - name: Check for NPM_TOKEN
         id: sec
         env:
@@ -46,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
       - name: Check for NUGET_API_KEY
         id: sec
         env:
