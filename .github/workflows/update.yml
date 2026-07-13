@@ -76,7 +76,11 @@ jobs:
       - name: Create GitHub Release
         if: steps.diff.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          # Use a PAT (not the default GITHUB_TOKEN) so the release:published
+          # event actually triggers publish.yml. Events created with the built-in
+          # GITHUB_TOKEN do not trigger further workflow runs — falls back to
+          # github.token if RELEASE_PAT is unset (release still cut, publish won't fire).
+          GH_TOKEN: ${{ secrets.RELEASE_PAT || github.token }}
         run: |
           {
             echo "Automated refresh on $(date -u +%Y-%m-%d)."
