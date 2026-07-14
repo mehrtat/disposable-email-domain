@@ -6,7 +6,7 @@ name: Update disposable domains
 # GitHub Release with the +added/-removed delta and the list files attached.
 on:
   schedule:
-    - cron: "0 6 * * 1" # every Monday 06:00 UTC
+    - cron: "0 12 * * *" # every day 12:00 UTC
   workflow_dispatch:
 
 permissions:
