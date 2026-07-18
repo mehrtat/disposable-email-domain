@@ -42,8 +42,11 @@ jobs:
         id: meta
         run: |
           count=$(grep -c . domains.txt)
-          added=$(comm -13 <(git show HEAD:domains.txt | sort) <(sort domains.txt) | grep -c . || true)
-          removed=$(comm -23 <(git show HEAD:domains.txt | sort) <(sort domains.txt) | grep -c . || true)
+          # keep the actual delta lists — the release step embeds and attaches them
+          comm -13 <(git show HEAD:domains.txt | sort) <(sort domains.txt) > added.txt
+          comm -23 <(git show HEAD:domains.txt | sort) <(sort domains.txt) > removed.txt
+          added=$(grep -c . added.txt || true)
+          removed=$(grep -c . removed.txt || true)
           latest=$(git tag -l 'v1.0.*' | sort -t. -k3 -n | tail -1)
           if [ -z "$latest" ]; then
             next="v1.0.0"
@@ -82,13 +85,31 @@ jobs:
           # github.token if RELEASE_PAT is unset (release still cut, publish won't fire).
           GH_TOKEN: ${{ secrets.RELEASE_PAT || github.token }}
         run: |
+          added=${{ steps.meta.outputs.added }}
+          removed=${{ steps.meta.outputs.removed }}
+          # Embed up to LIMIT domains per list inline (collapsed); the full lists
+          # are always attached as added.txt / removed.txt assets.
+          LIMIT=200
           {
             echo "Automated refresh on $(date -u +%Y-%m-%d)."
             echo
             echo "- Total domains: **${{ steps.meta.outputs.count }}**"
-            echo "- Added: **+${{ steps.meta.outputs.added }}**"
-            echo "- Removed: **-${{ steps.meta.outputs.removed }}**"
+            echo "- Added: **+${added}**"
+            echo "- Removed: **-${removed}**"
+            for kind in added removed; do
+              n=$(grep -c . "$kind.txt" || true)
+              [ "$n" -eq 0 ] && continue
+              echo
+              echo "<details><summary>${kind^} domains ($n)</summary>"
+              echo
+              echo '```'
+              head -n "$LIMIT" "$kind.txt"
+              [ "$n" -gt "$LIMIT" ] && echo "... and $(( n - LIMIT )) more — see $kind.txt asset"
+              echo '```'
+              echo
+              echo "</details>"
+            done
           } > release-notes.md
-          gh release create "${{ steps.meta.outputs.version }}" domains.txt domains.json \
+          gh release create "${{ steps.meta.outputs.version }}" domains.txt domains.json added.txt removed.txt \
             --title "${{ steps.meta.outputs.version }} ($(date -u +%Y-%m-%d))" \
             --notes-file release-notes.md

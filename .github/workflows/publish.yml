@@ -3,7 +3,9 @@ name: Publish packages
 # Fires when a Release is published (by update.yml). Builds and publishes the
 # npm and NuGet packages at the release tag. Each publish step is guarded on its
 # secret and SKIPS cleanly when the secret is absent, so the repo works before
-# any tokens are configured. Go and PHP need nothing — the git tag is the release.
+# any tokens are configured. For Go the git tag IS the release, but proxy.golang.org
+# and pkg.go.dev only index a version once someone requests it — the `go` job
+# below does that request so the module page never lags behind the tags.
 on:
   release:
     types: [published]
@@ -15,6 +17,26 @@ on:
         default: "v1.0.0"
 
 jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Register version with proxy.golang.org and pkg.go.dev
+        env:
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          MODULE: github.com/${{ github.repository }}
+        run: |
+          # Ask the module proxy for the new version so it gets cached/indexed,
+          # then ask pkg.go.dev to (re)fetch it. Both are idempotent; retry the
+          # proxy briefly in case the tag hasn't propagated yet.
+          for i in 1 2 3 4 5; do
+            curl -sf "https://proxy.golang.org/${MODULE}/@v/${TAG}.info" && break
+            echo "proxy not ready yet (attempt $i), retrying in 30s..."
+            sleep 30
+          done
+          curl -sf -X POST --max-time 600 -o /dev/null \
+            "https://pkg.go.dev/fetch/${MODULE}@${TAG}" \
+            || echo "pkg.go.dev fetch request failed — it will pick the version up on first visit."
+
   npm:
     runs-on: ubuntu-latest
     steps:
