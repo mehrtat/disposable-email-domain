@@ -5,7 +5,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <PackageId>DisposableEmailDomain</PackageId>
-    <Version>1.0.11</Version>
+    <Version>1.0.12</Version>
     <Authors>Mehrdad TAT</Authors>
     <Description>Aggregated, deduped, normalized list of disposable / temporary email domains, with an IsDisposable() helper. Auto-refreshed daily.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
