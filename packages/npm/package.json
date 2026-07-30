@@ -1,6 +1,6 @@
 {
   "name": "disposable-email-domain",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Aggregated, deduped, normalized list of disposable / temporary email domains, with an isDisposable() helper. Auto-refreshed daily.",
   "keywords": [
     "disposable",
