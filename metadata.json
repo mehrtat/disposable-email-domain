@@ -1,17 +1,17 @@
 {
-  "count": 193475,
+  "count": 193707,
   "sources": [
     {
       "url": "https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf",
-      "count": 10400
+      "count": 10455
     },
     {
       "url": "https://raw.githubusercontent.com/disposable/disposable-email-domains/master/domains.txt",
-      "count": 108875
+      "count": 109114
     },
     {
       "url": "https://raw.githubusercontent.com/7c/fakefilter/main/txt/data.txt",
-      "count": 4789
+      "count": 4776
     },
     {
       "url": "https://raw.githubusercontent.com/FGRibreau/mailchecker/master/list.txt",
